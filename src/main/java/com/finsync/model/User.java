@@ -11,6 +11,8 @@
       private String email;
       private String password;
       private String role;
+      private boolean verified;
+      private String verificationToken;
 
       public User() {}
 
@@ -31,4 +33,10 @@
 
       public String getRole() { return role; }
       public void setRole(String role) { this.role = role; }
+
+      public boolean isVerified() { return verified; }
+      public void setVerified(boolean verified) { this.verified = verified; }
+
+      public String getVerificationToken() { return verificationToken; }
+      public void setVerificationToken(String verificationToken) { this.verificationToken = verificationToken; }
   }
