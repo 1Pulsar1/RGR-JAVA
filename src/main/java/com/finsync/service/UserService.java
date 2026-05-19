@@ -5,23 +5,30 @@ import com.finsync.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, EmailService emailService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.emailService = emailService;
     }
 
     public void register(String email, String password) {
         if (userRepository.existsByEmail(email)) {
             throw new IllegalArgumentException("Пользователь с таким email уже существует");
         }
+        String token = UUID.randomUUID().toString();
         User user = new User(email, passwordEncoder.encode(password), "USER");
+        user.setVerificationToken(token);
         userRepository.save(user);
+        emailService.sendVerificationEmail(email, token);
     }
 
     public User findByEmail(String email) {
