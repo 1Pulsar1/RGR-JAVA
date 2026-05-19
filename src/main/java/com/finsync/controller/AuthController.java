@@ -40,4 +40,10 @@ public class AuthController {
             return "auth/register";
         }
     }
+
+    @GetMapping("/verify")
+    public String verify(@RequestParam String token) {
+        boolean ok = userService.verifyEmail(token);
+        return ok ? "redirect:/auth/login?verified" : "redirect:/auth/login?badToken";
+    }
 }

@@ -31,6 +31,15 @@ public class UserService {
         emailService.sendVerificationEmail(email, token);
     }
 
+    public boolean verifyEmail(String token) {
+        return userRepository.findByVerificationToken(token).map(user -> {
+            user.setVerified(true);
+            user.setVerificationToken(null);
+            userRepository.save(user);
+            return true;
+        }).orElse(false);
+    }
+
     public User findByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Пользователь не найден"));
