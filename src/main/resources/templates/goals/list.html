@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout('Финансовые цели', ~{::goals_content})}">
+<head>
+</head>
+<body>
+<div th:fragment="goals_content">
+    <style>
+        .goal-card { background-color: #E0E0E0; border-radius: 10px; padding: 20px; margin-bottom: 20px; }
+        .goal-title { font-weight: bold; color: #333; }
+        .btn-action { background-color: white; border: 1px solid #CCC; color: #333; border-radius: 8px; font-size: 14px; }
+        .progress-bar { background-color: #2962FF; }
+    </style>
+
+    <div th:each="goal : ${goals}" class="goal-card shadow-sm">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="goal-title" th:text="${goal.name}">Название цели</div>
+            <div class="goal-progress-text" th:text="${goal.currentAmount + ' / ' + goal.targetAmount + ' ₽'}">0 / 50 000 ₽</div>
+        </div>
+
+        <div class="progress mb-3" style="height: 10px;">
+            <div class="progress-bar" role="progressbar"
+                 th:style="'width: ' + ${goal.currentAmount * 100 / goal.targetAmount} + '%'"></div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button class="btn btn-action">Редактировать</button>
+            <button class="btn btn-action">Добавить накопление</button>
+        </div>
+    </div>
+
+    <div th:if="${#lists.isEmpty(goals)}" class="text-center py-5 text-muted goal-card">
+        Целей пока нет.
+    </div>
+
+    <button class="btn btn-primary rounded-circle shadow" style="position: fixed; bottom: 40px; right: 40px; width: 60px; height: 60px; font-size: 30px;">+</button>
+</div>
+</body>
+</html>

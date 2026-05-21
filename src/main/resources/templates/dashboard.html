@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::main})}">
+<body>
+<main>
+    <div class="mb-4">
+        <h2 class="fw-bold text-dark">Главная панель</h2>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm p-4 bg-white rounded-4">
+                <div class="text-muted small mb-1">Текущий баланс</div>
+                <div class="fs-3 fw-bold text-dark" th:text="${balance != null ? balance : 0} + ' ₽'">0 ₽</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm p-4 bg-white rounded-4">
+                <div class="text-muted small mb-1 text-success">Всего доходов</div>
+                <div class="fs-3 fw-bold text-success" th:text="${totalIncome != null ? totalIncome : 0} + ' ₽'">0 ₽</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm p-4 bg-white rounded-4">
+                <div class="text-muted small mb-1 text-danger">Всего расходов</div>
+                <div class="fs-3 fw-bold text-danger" th:text="${totalExpense != null ? totalExpense : 0} + ' ₽'">0 ₽</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8 mb-4">
+            <div class="card border-0 shadow-sm p-4 bg-white rounded-4 h-100">
+                <h5 class="fw-bold text-dark mb-3">Последние операции</h5>
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <tbody>
+                        <tr th:each="tx : ${recentTransactions}">
+                            <td class="text-muted small" th:text="${#temporals.format(tx.operationDate, 'dd.MM.yyyy HH:mm')}">15.05.2026 12:00</td>
+                            <td class="fw-medium text-dark" th:text="${tx.description}">Описание операции</td>
+                            <td class="text-end fw-bold"
+                                th:classappend="${tx.type == 'INCOME'} ? 'text-success' : 'text-danger'"
+                                th:text="${tx.type == 'INCOME' ? '+ ' + tx.amount + ' ₽' : '- ' + tx.amount + ' ₽'}">- 500 ₽</td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(recentTransactions)}">
+                            <td colspan="3" class="text-center text-muted py-4">Операций пока не было.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 mb-4">
+            <div class="card border-0 shadow-sm p-4 bg-white rounded-4 h-100">
+                <h5 class="fw-bold text-dark mb-3">Статус целей</h5>
+                <div th:each="goal : ${goals}" class="mb-3">
+                    <div class="d-flex justify-content-between small mb-1">
+                        <span class="fw-medium text-dark" th:text="${goal.title}">Название цели</span>
+                        <span class="text-muted" th:text="${goal.currentAmount != null ? goal.currentAmount : 0} + ' / ' + ${goal.targetAmount} + ' ₽'">0 / 50 000 ₽</span>
+                    </div>
+                    <div class="progress" style="height: 8px; border-radius: 4px;">
+                        <div class="progress-bar" role="progressbar"
+                             th:style="'width: ' + ${goal.progressPercent} + '%'"
+                             style="background-color: #1a237e;"></div>
+                    </div>
+                </div>
+                <div th:if="${#lists.isEmpty(goals)}" class="text-center text-muted py-4">
+                    Активных целей нет.
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>

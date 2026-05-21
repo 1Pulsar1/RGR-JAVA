@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout('Социальный режим', ~{::invites_content})}">
+<head>
+</head>
+<body>
+<div th:fragment="invites_content">
+    <style>
+        .social-block { background-color: #E0E0E0; border-radius: 10px; padding: 20px; margin-bottom: 30px; }
+        .form-invite-input { border-radius: 10px 0 0 10px; border: 1px solid #CCC; border-right: none; }
+        .btn-invite { background-color: white; border: 1px solid #CCC; color: #333; border-radius: 0 10px 10px 0; }
+    </style>
+
+    <div class="social-block">
+        <h6 class="text-secondary mb-3 fw-bold">Сравнительная статистика накоплений</h6>
+        <p class="text-muted">Раздел в разработке...</p>
+    </div>
+
+    <div class="social-block">
+        <h6 class="text-secondary mb-3 fw-bold">Отправить инвайт</h6>
+        <form th:action="@{/invites/send}" method="post" class="d-flex">
+            <input type="email" name="friendEmail" class="form-control form-invite-input" placeholder="E-mail для приглашения" required>
+            <button type="submit" class="btn btn-invite px-4 fw-bold">Отправить</button>
+        </form>
+    </div>
+
+    <div class="social-block">
+        <h6 class="text-secondary mb-3 fw-bold">Список друзей</h6>
+        <div th:each="friend : ${friends}" class="border-bottom py-2" th:text="${friend.username}">Имя друга</div>
+        <div th:if="${#lists.isEmpty(friends)}" class="text-muted text-center py-3">У вас пока нет добавленных друзей.</div>
+    </div>
+</div>
+</body>
+</html>

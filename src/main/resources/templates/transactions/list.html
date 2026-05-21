@@ -33,7 +33,7 @@
                     </select>
                 </div>
                 <div class="col-6">
-                    <input type="datetime-local" name="operationDate" class="form-control" required>
+                    <input type="datetime-local" name="operationDate" class="form-control">
                 </div>
             </div>
             <button type="submit" class="btn text-white w-100 py-2 fw-medium" style="background-color: #1a237e; border-radius: 8px;">Добавить транзакцию</button>
@@ -56,11 +56,15 @@
                     <td class="ps-4 text-muted small" th:text="${#temporals.format(tx.operationDate, 'dd.MM.yyyy HH:mm')}">15.05.2026 12:00</td>
                     <td class="fw-medium text-dark" th:text="${tx.description}">Покупка продуктов</td>
                     <td>
-                        <span class="badge bg-secondary-subtle text-secondary px-2 py-1 rounded" th:text="${tx.category != null ? tx.category.name : 'Без категории'}">Еда</span>
+                        <span class="badge bg-secondary-subtle text-secondary px-2 py-1 rounded"
+                              th:with="currentCat=${#lists.idForArrayOrList(categories) == null} ? null : ${categories.?[id == __${tx.categoryId}__]}"
+                              th:text="${currentCat != null and !currentCat.isEmpty()} ? currentCat[0].name : 'Без категории'">
+                            Еда
+                        </span>
                     </td>
                     <td class="text-end pe-4 fw-bold"
-                        th:classappend="${tx.type.name() == 'INCOME'} ? 'text-income' : 'text-expense'"
-                        th:text="${tx.type.name() == 'INCOME' ? '+ ' + tx.amount + ' ₽' : '- ' + tx.amount + ' ₽'}">
+                        th:classappend="${tx.type == 'INCOME'} ? 'text-success' : 'text-danger'"
+                        th:text="${tx.type == 'INCOME' ? '+ ' + tx.amount + ' ₽' : '- ' + tx.amount + ' ₽'}">
                         - 500 ₽
                     </td>
                 </tr>
