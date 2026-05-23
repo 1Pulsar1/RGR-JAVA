@@ -1,42 +1,51 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout(~{::main})}">
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>FinSync - Цель</title>
+    <link rel="stylesheet" th:href="@{/style.css}" href="/style.css">
+</head>
 <body>
-<main>
-    <div class="card border-0 shadow-sm p-4 bg-white rounded-4 mx-auto" style="max-width: 500px;">
-        <h4 class="fw-bold text-dark mb-4"
-            th:text="${goal.id == null} ? 'Новая цель' : 'Редактирование цели'">Цель</h4>
+<div th:replace="~{fragments/layout :: sidebar('goals')}"></div>
 
-        <form th:action="@{/goals/save}" method="post">
-            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+<main class="content">
+    <h1 th:text="${goal.id == null} ? 'Новая цель' : 'Редактирование цели'">Цель</h1>
+
+    <div class="gray-block" style="max-width: 480px">
+        <form th:action="@{/goals/save}" method="post" style="display:flex;flex-direction:column;gap:14px">
             <input type="hidden" name="id" th:value="${goal.id}"/>
 
-            <div class="mb-3">
-                <label class="form-label small text-muted fw-bold">Название</label>
+            <div>
+                <small>Название цели</small>
                 <input type="text" name="title" th:value="${goal.title}"
-                       class="form-control rounded-3" required placeholder="Например: Новый ноутбук">
+                       class="input-styled" required placeholder="Например: Новый ноутбук"
+                       style="width:100%;box-sizing:border-box">
             </div>
 
-            <div class="mb-3">
-                <label class="form-label small text-muted fw-bold">Целевая сумма (₽)</label>
+            <div>
+                <small>Целевая сумма (₽)</small>
                 <input type="number" step="0.01" name="targetAmount" th:value="${goal.targetAmount}"
-                       class="form-control rounded-3" required placeholder="0.00">
+                       class="input-styled" required placeholder="0.00"
+                       style="width:100%;box-sizing:border-box">
             </div>
 
-            <div class="mb-3">
-                <label class="form-label small text-muted fw-bold">Уже накоплено (₽)</label>
-                <input type="number" step="0.01" name="currentAmount" th:value="${goal.currentAmount}"
-                       class="form-control rounded-3" placeholder="0.00">
+            <div>
+                <small>Уже накоплено (₽)</small>
+                <input type="number" step="0.01" name="currentAmount"
+                       th:value="${goal.currentAmount != null ? goal.currentAmount : 0}"
+                       class="input-styled" placeholder="0.00"
+                       style="width:100%;box-sizing:border-box">
             </div>
 
-            <div class="mb-4">
-                <label class="form-label small text-muted fw-bold">Дедлайн (необязательно)</label>
+            <div>
+                <small>Срок (необязательно)</small>
                 <input type="date" name="deadline" th:value="${goal.deadline}"
-                       class="form-control rounded-3">
+                       class="input-styled" style="width:100%;box-sizing:border-box">
             </div>
 
-            <div class="d-flex gap-2">
-                <button type="submit" class="btn text-white px-4 rounded-3" style="background-color: #1a237e;">Сохранить</button>
-                <a th:href="@{/goals}" class="btn btn-light px-4 rounded-3">Отмена</a>
+            <div style="display:flex;gap:10px;margin-top:4px">
+                <button type="submit" class="btn-blue" style="padding:0 24px;height:38px">Сохранить</button>
+                <a th:href="@{/goals}" style="height:38px;line-height:38px;padding:0 16px;background:#f0f0f0;border-radius:6px;text-decoration:none;color:#333;font-size:14px">Отмена</a>
             </div>
         </form>
     </div>
