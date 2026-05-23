@@ -1,6 +1,8 @@
 package com.finsync.controller;
 
 import com.finsync.service.UserService;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -16,8 +18,10 @@ public class AdminController {
     }
 
     @GetMapping("/users")
-    public String users(Model model) {
+    public String users(Model model,
+                        @AuthenticationPrincipal UserDetails userDetails) {
         model.addAttribute("users", userService.findAll());
+        model.addAttribute("currentUserId", userService.findByEmail(userDetails.getUsername()).getId());
         return "admin/users";
     }
 
@@ -28,7 +32,12 @@ public class AdminController {
     }
 
     @PostMapping("/users/{id}/delete")
-    public String deleteUser(@PathVariable Integer id) {
+    public String deleteUser(@PathVariable Integer id,
+                             @AuthenticationPrincipal UserDetails userDetails) {
+        Integer currentId = userService.findByEmail(userDetails.getUsername()).getId();
+        if (currentId.equals(id)) {
+            return "redirect:/admin/users?error=self";
+        }
         userService.deleteUser(id);
         return "redirect:/admin/users";
     }
