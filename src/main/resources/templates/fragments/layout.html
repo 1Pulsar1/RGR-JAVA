@@ -25,6 +25,12 @@
                 социальный режим
             </a>
         </li>
+        <li th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+            <a th:href="@{/admin/users}"
+               th:class="${activePage == 'admin' ? 'active' : ''}">
+                администрирование
+            </a>
+        </li>
     </ul>
 
 </nav>

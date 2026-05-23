@@ -34,22 +34,7 @@ public class InviteController {
         model.addAttribute("sent", inviteService.getSent(userId));
         model.addAttribute("received", inviteService.getReceived(userId));
 
-        // собираем данные для сравнительного графика накоплений
-        List<Integer> partnerIds = inviteService.getAcceptedPartnerIds(userId);
-        List<String> chartLabels = new ArrayList<>();
-        List<BigDecimal> chartValues = new ArrayList<>();
-
-        chartLabels.add("Я");
-        chartValues.add(transactionService.getSavings(userId));
-
-        for (int partnerId : partnerIds) {
-            // TODO: заменить на email когда будет метод
-            chartLabels.add("Пользователь #" + partnerId);
-            chartValues.add(transactionService.getSavings(partnerId));
-        }
-
-        model.addAttribute("chartLabels", chartLabels);
-        model.addAttribute("chartValues", chartValues);
+        addChartData(userId, model);
 
         return "invites/list";
     }
@@ -65,9 +50,24 @@ public class InviteController {
             model.addAttribute("error", e.getMessage());
             model.addAttribute("sent", inviteService.getSent(userId));
             model.addAttribute("received", inviteService.getReceived(userId));
+            addChartData(userId, model);
             return "invites/list";
         }
         return "redirect:/invites";
+    }
+
+    private void addChartData(int userId, Model model) {
+        List<Integer> partnerIds = inviteService.getAcceptedPartnerIds(userId);
+        List<String> chartLabels = new ArrayList<>();
+        List<BigDecimal> chartValues = new ArrayList<>();
+        chartLabels.add("Я");
+        chartValues.add(transactionService.getSavings(userId));
+        for (int partnerId : partnerIds) {
+            chartLabels.add("Пользователь #" + partnerId);
+            chartValues.add(transactionService.getSavings(partnerId));
+        }
+        model.addAttribute("chartLabels", chartLabels);
+        model.addAttribute("chartValues", chartValues);
     }
 
     @PostMapping("/{id}/accept")
