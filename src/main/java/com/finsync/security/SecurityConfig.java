@@ -18,12 +18,13 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/**", "/css/**", "/js/**").permitAll()
+                .requestMatchers("/auth/**", "/css/**", "/js/**", "/*.css", "/*.js").permitAll()
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
                 .loginPage("/auth/login")
+                .usernameParameter("email")
                 .defaultSuccessUrl("/dashboard", true)
                 .failureUrl("/auth/login?error")
                 .permitAll()

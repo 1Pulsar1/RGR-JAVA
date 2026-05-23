@@ -38,6 +38,13 @@ public class TransactionService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
+    // накопления = доходы минус расходы
+    public BigDecimal getSavings(int userId) {
+        BigDecimal income = getTotalByType(userId, "INCOME");
+        BigDecimal expense = getTotalByType(userId, "EXPENSE");
+        return income.subtract(expense);
+    }
+
     public void save(Transaction transaction) {
         if (transaction.getOperationDate() == null) {
             transaction.setOperationDate(LocalDateTime.now());

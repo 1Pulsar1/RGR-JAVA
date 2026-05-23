@@ -45,6 +45,7 @@ public class DashboardController {
         model.addAttribute("totalExpense", totalExpense);
         model.addAttribute("recentTransactions", transactionService.getLastN(userId, 5));
         model.addAttribute("goals", goalService.getByUser(userId));
+        model.addAttribute("categories", transactionService.getAllCategories());
 
         return "index";
     }

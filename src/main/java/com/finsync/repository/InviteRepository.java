@@ -13,4 +13,8 @@ public interface InviteRepository extends CrudRepository<Invite, Integer> {
 
     @Query("SELECT * FROM invites WHERE sender_id = :userId")
     List<Invite> findBySenderId(int userId);
+
+    // все принятые инвайты где юзер либо отправитель либо получатель
+    @Query("SELECT * FROM invites WHERE (sender_id = :userId OR receiver_id = :userId) AND status = 'ACCEPTED'")
+    List<Invite> findAcceptedByUserId(int userId);
 }

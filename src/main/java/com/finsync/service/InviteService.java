@@ -5,6 +5,7 @@ import com.finsync.model.User;
 import com.finsync.repository.InviteRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -44,6 +45,20 @@ public class InviteService {
 
     public void decline(int inviteId) {
         updateStatus(inviteId, "DECLINED");
+    }
+
+    // возвращает id-шники всех с кем есть принятый инвайт
+    public List<Integer> getAcceptedPartnerIds(int userId) {
+        List<Invite> accepted = inviteRepository.findAcceptedByUserId(userId);
+        List<Integer> result = new ArrayList<>();
+        for (Invite inv : accepted) {
+            if (inv.getSenderId() == userId) {
+                result.add(inv.getReceiverId());
+            } else {
+                result.add(inv.getSenderId());
+            }
+        }
+        return result;
     }
 
     private void updateStatus(int inviteId, String status) {

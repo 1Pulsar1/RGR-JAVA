@@ -24,11 +24,10 @@ public class UserService {
         if (userRepository.existsByEmail(email)) {
             throw new IllegalArgumentException("Пользователь с таким email уже существует");
         }
-        String token = UUID.randomUUID().toString();
+        // email уже проверен через код — сразу ставим verified
         User user = new User(email, passwordEncoder.encode(password), "USER");
-        user.setVerificationToken(token);
+        user.setVerified(true);
         userRepository.save(user);
-        emailService.sendVerificationEmail(email, token);
     }
 
     public boolean verifyEmail(String token) {

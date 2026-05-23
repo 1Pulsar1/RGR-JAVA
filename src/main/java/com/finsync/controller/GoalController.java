@@ -9,6 +9,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 @Controller
 @RequestMapping("/goals")
 public class GoalController {
@@ -24,7 +27,17 @@ public class GoalController {
     @GetMapping
     public String list(@AuthenticationPrincipal UserDetails userDetails, Model model) {
         int userId = userService.findByEmail(userDetails.getUsername()).getId();
-        model.addAttribute("goals", goalService.getByUser(userId));
+        List<FinancialGoal> goals = goalService.getByUser(userId);
+        BigDecimal totalTarget = goals.stream()
+                .map(g -> g.getTargetAmount() != null ? g.getTargetAmount() : BigDecimal.ZERO)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal totalCurrent = goals.stream()
+                .map(g -> g.getCurrentAmount() != null ? g.getCurrentAmount() : BigDecimal.ZERO)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        model.addAttribute("goals", goals);
+        model.addAttribute("goalCount", goals.size());
+        model.addAttribute("totalTarget", totalTarget);
+        model.addAttribute("totalCurrent", totalCurrent);
         return "goals/list";
     }
 

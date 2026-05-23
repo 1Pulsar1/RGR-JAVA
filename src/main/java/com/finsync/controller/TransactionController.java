@@ -1,5 +1,6 @@
 package com.finsync.controller;
 
+import com.finsync.model.Category;
 import com.finsync.model.Transaction;
 import com.finsync.service.TransactionService;
 import com.finsync.service.UserService;
@@ -10,6 +11,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/transactions")
@@ -27,7 +30,11 @@ public class TransactionController {
     public String list(@AuthenticationPrincipal UserDetails userDetails, Model model) {
         int userId = userService.findByEmail(userDetails.getUsername()).getId();
         model.addAttribute("transactions", transactionService.getByUser(userId));
-        model.addAttribute("categories", transactionService.getAllCategories());
+        Iterable<Category> categories = transactionService.getAllCategories();
+        Map<Integer, String> categoryMap = new HashMap<>();
+        categories.forEach(c -> categoryMap.put(c.getId(), c.getName()));
+        model.addAttribute("categories", categories);
+        model.addAttribute("categoryMap", categoryMap);
         return "transactions/list";
     }
 

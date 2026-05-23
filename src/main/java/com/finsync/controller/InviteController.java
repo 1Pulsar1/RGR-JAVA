@@ -1,6 +1,7 @@
 package com.finsync.controller;
 
 import com.finsync.service.InviteService;
+import com.finsync.service.TransactionService;
 import com.finsync.service.UserService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -8,16 +9,23 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
 @Controller
 @RequestMapping("/invites")
 public class InviteController {
 
     private final InviteService inviteService;
     private final UserService userService;
+    private final TransactionService transactionService;
 
-    public InviteController(InviteService inviteService, UserService userService) {
+    public InviteController(InviteService inviteService, UserService userService,
+                            TransactionService transactionService) {
         this.inviteService = inviteService;
         this.userService = userService;
+        this.transactionService = transactionService;
     }
 
     @GetMapping
@@ -25,6 +33,24 @@ public class InviteController {
         int userId = userService.findByEmail(userDetails.getUsername()).getId();
         model.addAttribute("sent", inviteService.getSent(userId));
         model.addAttribute("received", inviteService.getReceived(userId));
+
+        // собираем данные для сравнительного графика накоплений
+        List<Integer> partnerIds = inviteService.getAcceptedPartnerIds(userId);
+        List<String> chartLabels = new ArrayList<>();
+        List<BigDecimal> chartValues = new ArrayList<>();
+
+        chartLabels.add("Я");
+        chartValues.add(transactionService.getSavings(userId));
+
+        for (int partnerId : partnerIds) {
+            // TODO: заменить на email когда будет метод
+            chartLabels.add("Пользователь #" + partnerId);
+            chartValues.add(transactionService.getSavings(partnerId));
+        }
+
+        model.addAttribute("chartLabels", chartLabels);
+        model.addAttribute("chartValues", chartValues);
+
         return "invites/list";
     }
 
