@@ -26,7 +26,12 @@ public class AdminController {
     }
 
     @PostMapping("/users/{id}/role")
-    public String changeRole(@PathVariable Integer id, @RequestParam String role) {
+    public String changeRole(@PathVariable Integer id, @RequestParam String role,
+                             @AuthenticationPrincipal UserDetails userDetails) {
+        Integer currentId = userService.findByEmail(userDetails.getUsername()).getId();
+        if (currentId.equals(id)) {
+            return "redirect:/admin/users?error=self";
+        }
         userService.changeRole(id, role);
         return "redirect:/admin/users";
     }

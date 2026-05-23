@@ -54,7 +54,8 @@
             </td>
             <td>
                 <div class="row-actions">
-                    <form th:action="@{/admin/users/{id}/role(id=${u.id})}" method="post" style="display:flex;gap:6px">
+                    <form th:if="${u.id != currentUserId}"
+                          th:action="@{/admin/users/{id}/role(id=${u.id})}" method="post" style="display:flex;gap:6px">
                         <select name="role">
                             <option value="USER"  th:selected="${u.role == 'USER'}">USER</option>
                             <option value="ADMIN" th:selected="${u.role == 'ADMIN'}">ADMIN</option>
