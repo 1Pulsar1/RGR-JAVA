@@ -1,0 +1,336 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    height: 100vh;
+    background-color: #ffffff;
+    color: #333;
+}
+
+.sidebar {
+    width: 220px;
+    background-color: #2e5bff;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+}
+
+.logo {
+    font-size: 28px;
+    font-weight: bold;
+    padding: 30px 20px;
+    font-family: serif;
+}
+
+.nav-links {
+    list-style: none;
+    flex-grow: 1;
+}
+
+.nav-links li a {
+    color: rgba(255, 255, 255, 0.75);
+    text-decoration: none;
+    display: block;
+    padding: 15px 20px;
+    font-size: 15px;
+}
+
+.nav-links li a:hover,
+.nav-links li a.active {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.15);
+    font-weight: bold;
+}
+
+.footer-link {
+    padding: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-link a {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.content {
+    flex-grow: 1;
+    padding: 40px;
+    overflow-y: auto;
+}
+
+h1 {
+    font-size: 28px;
+    font-weight: normal;
+    margin-bottom: 25px;
+}
+
+h3 {
+    font-size: 20px;
+    font-weight: normal;
+    margin-bottom: 15px;
+}
+
+h4 {
+    font-size: 15px;
+    font-weight: normal;
+    margin-bottom: 15px;
+}
+
+.gray-block {
+    background-color: #e9ecef;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 25px;
+}
+
+.btn-blue {
+    background-color: #2e5bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-blue:hover {
+    background-color: #1a46e6;
+}
+
+.input-styled {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    background-color: white;
+    font-size: 14px;
+    outline: none;
+}
+
+.auth-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    background-color: #fff;
+    height: 100vh;
+}
+
+.auth-card {
+    background: #d9d9d9;
+    padding: 45px;
+    border-radius: 35px;
+    width: 400px;
+    text-align: center;
+}
+
+.auth-card h2 {
+    margin-bottom: 30px;
+    font-weight: normal;
+}
+
+.auth-form-container {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.auth-form-container p {
+    font-size: 14px;
+}
+
+.auth-card .input-styled {
+    border-radius: 20px;
+}
+
+.auth-card .btn-blue {
+    width: 100%;
+    border-radius: 20px;
+    margin-top: 20px;
+    padding: 12px;
+}
+
+
+.finance-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    background: white;
+}
+
+.finance-table th {
+    background-color: #e9ecef;
+    padding: 12px;
+    text-align: left;
+    font-size: 14px;
+    font-weight: bold;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.finance-table td {
+    padding: 12px;
+    font-size: 14px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.col-date { width: 12%; }
+.col-name { width: 30%; }
+.col-cat  { width: 15%; }
+.col-type { width: 10%; }
+.col-sum  { width: 13%; }
+.col-act  { width: 20%; }
+
+.action-link {
+    text-decoration: none;
+    font-size: 13px;
+    margin: 0 5px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.delete-link {
+    background-color: #fff;
+    color: #dc3545;
+    border: 1px solid #dc3545;
+}
+
+.delete-link:hover {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+.dashboard-chart-box {
+    height: 220px;
+    border-left: 2px solid #000;
+    border-bottom: 2px solid #000;
+    margin: 0 50px;
+}
+
+.dashboard-goals-grid {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 35px;
+}
+
+.dashboard-goal-box {
+    flex: 1;
+    height: 100px;
+}
+
+.dashboard-add-goal-btn {
+    flex: 1;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #004095;
+    font-weight: bold;
+}
+
+.dashboard-operation-form {
+    display: flex;
+    gap: 8px;
+}
+
+.dashboard-operation-form .btn-blue {
+    background: #2e5bff;
+}
+
+.dashboard-operation-form .input-title {
+    flex: 1.5;
+    cursor: text;
+}
+
+.dashboard-operation-form .input-amount {
+    flex: 1;
+    cursor: text;
+}
+
+.dashboard-operation-form .btn-dropdown {
+    flex: 1;
+}
+
+.dashboard-operation-form .btn-date {
+    flex: 1;
+}
+
+.dashboard-operation-form .btn-income {
+    flex: 1.2;
+}
+
+.dashboard-operation-form .btn-expense {
+    flex: 1.2;
+}
+
+.finance-layout {
+    display: flex;
+    gap: 25px;
+}
+
+.finance-search-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.finance-sidebar-panel {
+    width: 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.quick-add-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.circle-chart-box {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 15px solid #ccc;
+    margin: 20px 0;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.circle-chart-text {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.goals-add-grid {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+}
+
+.goals-flex-1 { flex: 1; }
+.goals-flex-1-2 { flex: 1.2; }
+.goals-flex-2 { flex: 2; }
+
+.social-layout {
+    display: flex;
+    gap: 20px;
+}
+
+.social-friends-input-group {
+    display: flex;
+    gap: 15px;
+}

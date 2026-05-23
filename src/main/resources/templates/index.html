@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>FinSync - Рабочий стол</title>
+    <link rel="stylesheet" th:href="@{/style.css}" href="/style.css">
+    <style>
+        .balance-strip { background: #3949ab; color: #fff; border-radius: 8px; padding: 16px 24px;
+            display: flex; gap: 40px; margin-bottom: 20px; }
+        .balance-strip .b-item { display: flex; flex-direction: column; }
+        .balance-strip .b-val { font-size: 22px; font-weight: 700; }
+        .balance-strip .b-lbl { font-size: 12px; opacity: .8; }
+        .goal-mini { background: #f5f5f5; border-radius: 8px; padding: 12px; }
+        .goal-mini-title { font-size: 13px; font-weight: 600; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .goal-mini-bar { background: #e8eaf6; border-radius: 20px; height: 8px; overflow: hidden; margin-bottom: 4px; }
+        .goal-mini-fill { background: #3949ab; height: 100%; border-radius: 20px; }
+        .goal-mini-pct { font-size: 11px; color: #3949ab; font-weight: 600; }
+        .quick-form input, .quick-form select { flex: 1; min-width: 100px; }
+    </style>
+</head>
+<body>
+<div th:replace="~{fragments/layout :: sidebar('dashboard')}"></div>
+
+<main class="content">
+
+    <div class="balance-strip">
+        <div class="b-item">
+            <span class="b-val" th:text="${balance} + ' ₽'">0 ₽</span>
+            <span class="b-lbl">баланс</span>
+        </div>
+        <div class="b-item">
+            <span class="b-val" th:text="${totalIncome} + ' ₽'">0 ₽</span>
+            <span class="b-lbl">доходы</span>
+        </div>
+        <div class="b-item">
+            <span class="b-val" th:text="${totalExpense} + ' ₽'">0 ₽</span>
+            <span class="b-lbl">расходы</span>
+        </div>
+    </div>
+
+    <div class="gray-block" style="margin-bottom:20px">
+        <p style="margin-bottom:12px;font-weight:600">График доходов и расходов</p>
+        <canvas id="incomeExpenseChart" height="80"></canvas>
+    </div>
+
+    <h3>Финансовые цели</h3>
+    <div class="dashboard-goals-grid" style="margin-bottom:20px">
+        <div th:each="goal, iter : ${goals}" th:if="${iter.index < 2}" class="goal-mini">
+            <div class="goal-mini-title" th:text="${goal.title}">Цель</div>
+            <div class="goal-mini-bar">
+                <div class="goal-mini-fill" th:style="'width: ' + ${goal.progressPercent} + '%'"></div>
+            </div>
+            <div class="goal-mini-pct" th:text="${goal.progressPercent} + '%'">0%</div>
+        </div>
+        <div class="gray-block dashboard-add-goal-btn" style="display:flex;align-items:center;justify-content:center">
+            <a th:href="@{/goals}" style="color:#3949ab;text-decoration:none;font-weight:600">+ добавить новую цель</a>
+        </div>
+    </div>
+
+    <h3>Быстрое добавление операции</h3>
+    <div class="gray-block">
+        <form th:action="@{/transactions/save}" method="post"
+              class="quick-form" style="display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end">
+            <input type="text" class="btn-blue input-title" name="description" placeholder="название" required>
+            <input type="number" step="0.01" class="btn-blue input-amount" name="amount" placeholder="сумма" required>
+            <select class="btn-blue btn-dropdown" name="categoryId">
+                <option value="">категория</option>
+                <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"></option>
+            </select>
+            <input type="datetime-local" class="btn-blue btn-date" name="operationDate">
+            <button type="submit" name="type" value="INCOME" class="btn-blue btn-income">добавить доход</button>
+            <button type="submit" name="type" value="EXPENSE" class="btn-blue btn-expense">добавить расход</button>
+        </form>
+    </div>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script th:inline="javascript">
+    const totalIncome = /*[[${totalIncome}]]*/ 0;
+    const totalExpense = /*[[${totalExpense}]]*/ 0;
+
+    new Chart(document.getElementById('incomeExpenseChart'), {
+        type: 'bar',
+        data: {
+            labels: ['Доходы', 'Расходы'],
+            datasets: [{
+                label: 'Сумма (₽)',
+                data: [totalIncome, totalExpense],
+                backgroundColor: ['#3949ab', '#ef5350'],
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+</script>
+</body>
+</html>

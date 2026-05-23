@@ -59,4 +59,8 @@ public class UserService {
     public void deleteUser(Integer userId) {
         userRepository.deleteById(userId);
     }
+
+    public void save(User user) {
+        userRepository.save(user);
+    }
 }

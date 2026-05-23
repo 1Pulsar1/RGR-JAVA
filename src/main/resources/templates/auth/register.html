@@ -1,34 +1,81 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Регистрация аккаунта</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>FinSync - Регистрация</title>
+    <link rel="stylesheet" th:href="@{/style.css}" href="/style.css">
 </head>
-<body class="bg-light" style="font-family: 'Segoe UI', system-ui, sans-serif;">
-<div class="container d-flex justify-content-center align-items-center vh-100">
-    <div class="card border-0 shadow-sm p-4 bg-white rounded-4" style="width: 100%; max-width: 400px;">
-        <h3 class="fw-normal text-center text-secondary mb-4">Регистрация</h3>
+<body class="auth-wrapper">
+<meta name="_csrf" th:content="${_csrf.token}"/>
+<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+<div class="auth-card">
+    <h2>Регистрация</h2>
 
-        <form th:action="@{/register}" method="post">
-            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+    <div th:if="${error}" th:text="${error}" style="color: #ff4d4d; margin-bottom: 15px;"></div>
 
-            <div class="mb-3">
-                <label class="form-label small text-muted fw-bold">Электронная почта</label>
-                <input type="email" name="email" class="form-control rounded-3" placeholder="user@test.ru" required>
-            </div>
-            <div class="mb-4">
-                <label class="form-label small text-muted fw-bold">Придумайте пароль</label>
-                <input type="password" name="password" class="form-control rounded-3" placeholder="Минимум 6 симвовов" required>
-            </div>
+    <form th:action="@{/auth/register}" method="post" class="auth-form-container">
+        <p style="margin-bottom: 5px">Введите почту</p>
+        <input type="email" id="email" name="email" class="input-styled" required />
 
-            <button type="submit" class="btn text-white w-100 py-2 rounded-pill shadow-sm mb-3" style="background-color: #1a237e;">Создать аккаунт</button>
+        <button type="button" onclick="sendEmailCode()" class="btn-blue"
+                style="margin-top: 8px; width: 100%; background-color: #6c757d;">
+            Получить код на почту
+        </button>
 
-            <div class="text-center small">
-                <span class="text-muted">Уже зарегистрированы?</span>
-                <a th:href="@{/login}" class="text-decoration-none fw-medium" style="color: #1a237e;">Войти</a>
-            </div>
-        </form>
+        <p style="margin: 15px 0 5px">Введите пароль</p>
+        <input type="password" name="password" class="input-styled" required />
+
+        <p style="margin: 15px 0 5px">Код подтверждения из почты</p>
+        <input type="text"
+               name="code"
+               class="input-styled"
+               maxlength="6"
+               placeholder="123456"
+               required />
+
+        <button type="submit" class="btn-blue" style="margin-top: 20px; width: 100%;">
+            Зарегистрироваться
+        </button>
+    </form>
+
+    <script>
+        function sendEmailCode() {
+            const email = document.getElementById('email').value.trim();
+
+            if (!email) {
+                alert('Введите email!');
+                return;
+            }
+
+            const csrf = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+
+            fetch('/auth/send-code', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRF-TOKEN': csrf
+                },
+                body: 'email=' + encodeURIComponent(email)
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert(' Код успешно отправлен на почту!');
+                    } else {
+                        return response.text().then(text => {
+                            alert(' Ошибка: ' + text);
+                        });
+                    }
+                })
+                .catch(err => {
+                    console.error('Ошибка:', err);
+                    alert('Ошибка сети! Проверьте, запущен ли сервер на localhost:8080');
+                });
+        }
+    </script>
+
+    <div style="margin-top: 15px; text-align: center;">
+        <a th:href="@{/auth/login}" style="color: #4a90e2; text-decoration: none;">Уже есть аккаунт? Войти</a>
     </div>
 </div>
 </body>
+</html>

@@ -1,33 +1,135 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout('Социальный режим', ~{::invites_content})}">
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
+    <title>FinSync - Социальный режим</title>
+    <link rel="stylesheet" th:href="@{/style.css}" href="/style.css">
+    <style>
+        .invite-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 14px;
+            background: #f5f5f5;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .status-badge {
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+        .status-pending  { background: #fff3e0; color: #e65100; }
+        .status-accepted { background: #e8f5e9; color: #2e7d32; }
+        .status-declined { background: #fce4ec; color: #c62828; }
+        .invite-actions form { display: inline; margin-left: 6px; }
+        .btn-accept  { background: #2e5bff; color: #fff; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .btn-decline { background: #ef5350; color: #fff; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+    </style>
 </head>
 <body>
-<div th:fragment="invites_content">
-    <style>
-        .social-block { background-color: #E0E0E0; border-radius: 10px; padding: 20px; margin-bottom: 30px; }
-        .form-invite-input { border-radius: 10px 0 0 10px; border: 1px solid #CCC; border-right: none; }
-        .btn-invite { background-color: white; border: 1px solid #CCC; color: #333; border-radius: 0 10px 10px 0; }
-    </style>
+<div th:replace="~{fragments/layout :: sidebar('social')}"></div>
 
-    <div class="social-block">
-        <h6 class="text-secondary mb-3 fw-bold">Сравнительная статистика накоплений</h6>
-        <p class="text-muted">Раздел в разработке...</p>
+<main class="content">
+    <h1>Социальный режим</h1>
+
+    <!-- сравнительный график накоплений -->
+    <div class="gray-block" style="margin-bottom: 25px">
+        <p style="font-weight: 600; margin-bottom: 15px">Сравнительная статистика накоплений</p>
+        <canvas id="savingsChart" height="80"></canvas>
+        <p th:if="${chartLabels.size() == 1}"
+           style="color: #999; font-size: 13px; margin-top: 10px; text-align: center">
+            Примите или отправьте инвайт чтобы видеть сравнение
+        </p>
     </div>
 
-    <div class="social-block">
-        <h6 class="text-secondary mb-3 fw-bold">Отправить инвайт</h6>
-        <form th:action="@{/invites/send}" method="post" class="d-flex">
-            <input type="email" name="friendEmail" class="form-control form-invite-input" placeholder="E-mail для приглашения" required>
-            <button type="submit" class="btn btn-invite px-4 fw-bold">Отправить</button>
-        </form>
-    </div>
+    <div class="social-layout">
 
-    <div class="social-block">
-        <h6 class="text-secondary mb-3 fw-bold">Список друзей</h6>
-        <div th:each="friend : ${friends}" class="border-bottom py-2" th:text="${friend.username}">Имя друга</div>
-        <div th:if="${#lists.isEmpty(friends)}" class="text-muted text-center py-3">У вас пока нет добавленных друзей.</div>
+        <!-- отправка инвайта -->
+        <div style="flex: 1; min-width: 260px">
+            <h3>Отправить приглашение</h3>
+            <div class="gray-block">
+                <div th:if="${error}" th:text="${error}"
+                     style="color: #c0392b; margin-bottom: 10px; font-size: 14px"></div>
+                <form th:action="@{/invites/send}" method="post">
+                    <input type="email" class="input-styled" name="email"
+                           placeholder="E-mail для приглашения" required
+                           style="margin-bottom: 10px">
+                    <button type="submit" class="btn-blue" style="width: 100%">
+                        Отправить инвайт
+                    </button>
+                </form>
+            </div>
+
+            <h3>Входящие</h3>
+            <div th:if="${received.empty}" style="color: #999; font-size: 14px; padding: 10px 0">
+                Входящих приглашений нет
+            </div>
+            <div th:each="inv : ${received}" class="invite-row">
+                <span>Приглашение от пользователя #<span th:text="${inv.senderId}"></span></span>
+                <div class="invite-actions">
+                    <form th:action="@{/invites/{id}/accept(id=${inv.id})}" method="post">
+                        <button type="submit" class="btn-accept">Принять</button>
+                    </form>
+                    <form th:action="@{/invites/{id}/decline(id=${inv.id})}" method="post">
+                        <button type="submit" class="btn-decline">Отклонить</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- отправленные инвайты -->
+        <div style="flex: 1; min-width: 260px">
+            <h3>Отправленные</h3>
+            <div th:if="${sent.empty}" style="color: #999; font-size: 14px; padding: 10px 0">
+                Отправленных приглашений нет
+            </div>
+            <div th:each="inv : ${sent}" class="invite-row">
+                <span>Пользователю #<span th:text="${inv.receiverId}"></span></span>
+                <span class="status-badge"
+                      th:classappend="${inv.status == 'PENDING'} ? 'status-pending' : (${inv.status == 'ACCEPTED'} ? 'status-accepted' : 'status-declined')"
+                      th:text="${inv.status == 'PENDING'} ? 'Ожидает' : (${inv.status == 'ACCEPTED'} ? 'Принято' : 'Отклонено')">
+                </span>
+            </div>
+        </div>
+
     </div>
-</div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script th:inline="javascript">
+    const labels = /*[[${chartLabels}]]*/ [];
+    const values = /*[[${chartValues}]]*/ [];
+
+    new Chart(document.getElementById('savingsChart'), {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Накопления (₽)',
+                data: values,
+                backgroundColor: ['#2e5bff', '#5c6bc0', '#7986cb', '#9fa8da'],
+                borderRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(ctx) {
+                            return ctx.parsed.y + ' ₽';
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+</script>
 </body>
 </html>

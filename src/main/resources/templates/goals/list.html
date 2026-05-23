@@ -1,38 +1,96 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/layout :: layout('Финансовые цели', ~{::goals_content})}">
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
+    <title>FinSync - Цели</title>
+    <link rel="stylesheet" th:href="@{/style.css}" href="/style.css">
+    <style>
+        .goal-card { background: #fff; border-radius: 8px; padding: 16px; margin-bottom: 14px; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+        .goal-title { font-weight: 600; font-size: 15px; margin-bottom: 6px; }
+        .goal-meta { font-size: 13px; color: #666; margin-bottom: 8px; }
+        .progress-wrap { background: #e8eaf6; border-radius: 20px; height: 10px; overflow: hidden; margin-bottom: 6px; }
+        .progress-fill { background: #3949ab; height: 100%; border-radius: 20px; transition: width .3s; }
+        .goal-pct { font-size: 12px; color: #3949ab; font-weight: 600; }
+        .goal-actions { margin-top: 8px; display: flex; gap: 10px; }
+        .goal-actions a { font-size: 13px; color: #3949ab; text-decoration: none; }
+        .goal-actions a:hover { text-decoration: underline; }
+        .goal-actions button { font-size: 13px; color: #c0392b; background: none; border: none; cursor: pointer; padding: 0; }
+        .goals-summary { background: #3949ab; color: #fff; border-radius: 8px; padding: 16px 20px; margin-bottom: 20px; display: flex; gap: 30px; }
+        .goals-summary .s-item { display: flex; flex-direction: column; }
+        .goals-summary .s-val { font-size: 20px; font-weight: 700; }
+        .goals-summary .s-lbl { font-size: 12px; opacity: .8; }
+    </style>
 </head>
 <body>
-<div th:fragment="goals_content">
-    <style>
-        .goal-card { background-color: #E0E0E0; border-radius: 10px; padding: 20px; margin-bottom: 20px; }
-        .goal-title { font-weight: bold; color: #333; }
-        .btn-action { background-color: white; border: 1px solid #CCC; color: #333; border-radius: 8px; font-size: 14px; }
-        .progress-bar { background-color: #2962FF; }
-    </style>
+<div th:replace="~{fragments/layout :: sidebar('goals')}"></div>
 
-    <div th:each="goal : ${goals}" class="goal-card shadow-sm">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <div class="goal-title" th:text="${goal.name}">Название цели</div>
-            <div class="goal-progress-text" th:text="${goal.currentAmount + ' / ' + goal.targetAmount + ' ₽'}">0 / 50 000 ₽</div>
+<main class="content">
+    <h1>Финансовые цели</h1>
+
+    <div class="goals-summary">
+        <div class="s-item">
+            <span class="s-val" th:text="${goalCount}">0</span>
+            <span class="s-lbl">целей</span>
         </div>
-
-        <div class="progress mb-3" style="height: 10px;">
-            <div class="progress-bar" role="progressbar"
-                 th:style="'width: ' + ${goal.currentAmount * 100 / goal.targetAmount} + '%'"></div>
+        <div class="s-item">
+            <span class="s-val" th:text="${totalTarget} + ' ₽'">0 ₽</span>
+            <span class="s-lbl">общая сумма целей</span>
         </div>
-
-        <div class="d-flex gap-2">
-            <button class="btn btn-action">Редактировать</button>
-            <button class="btn btn-action">Добавить накопление</button>
+        <div class="s-item">
+            <span class="s-val" th:text="${totalCurrent} + ' ₽'">0 ₽</span>
+            <span class="s-lbl">уже накоплено</span>
         </div>
     </div>
 
-    <div th:if="${#lists.isEmpty(goals)}" class="text-center py-5 text-muted goal-card">
-        Целей пока нет.
+    <div th:if="${goals.empty}" class="gray-block" style="text-align:center;color:#999;padding:30px">
+        Целей пока нет — добавьте первую ниже
     </div>
 
-    <button class="btn btn-primary rounded-circle shadow" style="position: fixed; bottom: 40px; right: 40px; width: 60px; height: 60px; font-size: 30px;">+</button>
-</div>
+    <div th:each="goal : ${goals}" class="goal-card">
+        <div class="goal-title" th:text="${goal.title}">Название цели</div>
+        <div class="goal-meta">
+            <span th:text="${goal.currentAmount ?: 0} + ' ₽ из ' + ${goal.targetAmount} + ' ₽'">0 ₽ из 0 ₽</span>
+            <span th:if="${goal.deadline}" th:text="' · до ' + ${#temporals.format(goal.deadline, 'dd.MM.yyyy')}"
+                  style="margin-left:8px"></span>
+        </div>
+        <div class="progress-wrap">
+            <div class="progress-fill" th:style="'width: ' + ${goal.progressPercent} + '%'"></div>
+        </div>
+        <div class="goal-pct" th:text="${goal.progressPercent} + '%'">0%</div>
+        <div class="goal-actions">
+            <a th:href="@{/goals/{id}/edit(id=${goal.id})}">Редактировать</a>
+            <form th:action="@{/goals/{id}/delete(id=${goal.id})}" method="post" style="display:inline">
+                <button type="submit">Удалить</button>
+            </form>
+        </div>
+    </div>
+
+    <h3 style="margin-top:30px">Добавить цель</h3>
+    <div class="gray-block">
+        <form th:action="@{/goals/save}" method="post" style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end">
+            <div style="flex:2;min-width:180px">
+                <small>Название цели</small>
+                <input type="text" class="input-styled" name="title" placeholder="Название цели" required
+                       style="width:100%;box-sizing:border-box">
+            </div>
+            <div style="flex:1;min-width:120px">
+                <small>Целевая сумма</small>
+                <input type="number" step="0.01" class="input-styled" name="targetAmount" placeholder="Сумма" required
+                       style="width:100%;box-sizing:border-box">
+            </div>
+            <div style="flex:1;min-width:120px">
+                <small>Уже накоплено</small>
+                <input type="number" step="0.01" class="input-styled" name="currentAmount" placeholder="0"
+                       style="width:100%;box-sizing:border-box">
+            </div>
+            <div style="flex:1;min-width:140px">
+                <small>Срок</small>
+                <input type="date" class="input-styled" name="deadline"
+                       style="width:100%;box-sizing:border-box">
+            </div>
+            <button type="submit" class="btn-blue" style="height:38px;padding:0 20px">Добавить цель</button>
+        </form>
+    </div>
+</main>
 </body>
 </html>

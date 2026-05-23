@@ -26,6 +26,12 @@ public class DashboardController {
         this.userService = userService;
     }
 
+
+    @GetMapping("/")
+    public String root() {
+        return "redirect:/auth/register";
+    }
+
     @GetMapping("/dashboard")
     public String dashboard(@AuthenticationPrincipal UserDetails userDetails, Model model) {
         int userId = userService.findByEmail(userDetails.getUsername()).getId();
@@ -40,6 +46,7 @@ public class DashboardController {
         model.addAttribute("recentTransactions", transactionService.getLastN(userId, 5));
         model.addAttribute("goals", goalService.getByUser(userId));
 
-        return "dashboard";
+        return "index";
     }
+
 }
