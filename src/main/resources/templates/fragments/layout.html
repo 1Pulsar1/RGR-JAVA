@@ -1,4 +1,4 @@
-<nav th:fragment="sidebar(activePage)" class="sidebar">
+<nav th:fragment="sidebar(activePage)" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" class="sidebar">
     <div class="logo">FinSync</div>
     <ul class="nav-links">
         <li>
@@ -25,7 +25,7 @@
                 социальный режим
             </a>
         </li>
-        <li th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+        <li th:if="${isAdmin}">
             <a th:href="@{/admin/users}"
                th:class="${activePage == 'admin' ? 'active' : ''}">
                 администрирование
