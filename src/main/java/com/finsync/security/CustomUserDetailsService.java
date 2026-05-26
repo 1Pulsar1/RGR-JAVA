@@ -28,7 +28,8 @@ public class CustomUserDetailsService implements UserDetailsService {
                 user.getEmail(),
                 user.getPassword(),
                 user.isVerified(),
-                true, true, true,
+                true, true,
+                !user.isBlocked(),
                 List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole()))
         );
     }

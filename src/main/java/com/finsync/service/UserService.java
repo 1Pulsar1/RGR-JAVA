@@ -59,6 +59,13 @@ public class UserService {
         userRepository.deleteById(userId);
     }
 
+    public void toggleBlock(Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Пользователь не найден"));
+        user.setBlocked(!user.isBlocked());
+        userRepository.save(user);
+    }
+
     public void save(User user) {
         userRepository.save(user);
     }
