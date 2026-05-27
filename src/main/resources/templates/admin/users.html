@@ -19,8 +19,12 @@
         .row-actions select { font-size: 12px; padding: 3px 6px; border: 1px solid #ccc; border-radius: 4px; }
         .btn-ok  { font-size: 12px; padding: 3px 10px; background: #3949ab; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
         .btn-ok:hover  { background: #303f9f; }
-        .btn-del { font-size: 12px; padding: 3px 10px; background: none; color: #c0392b; border: 1px solid #c0392b; border-radius: 4px; cursor: pointer; }
-        .btn-del:hover { background: #fde8e8; }
+        .btn-del   { font-size: 12px; padding: 3px 10px; background: none; color: #c0392b; border: 1px solid #c0392b; border-radius: 4px; cursor: pointer; }
+        .btn-del:hover   { background: #fde8e8; }
+        .btn-block   { font-size: 12px; padding: 3px 10px; background: none; color: #e67e22; border: 1px solid #e67e22; border-radius: 4px; cursor: pointer; }
+        .btn-block:hover { background: #fef9f0; }
+        .btn-unblock { font-size: 12px; padding: 3px 10px; background: none; color: #27ae60; border: 1px solid #27ae60; border-radius: 4px; cursor: pointer; }
+        .btn-unblock:hover { background: #eafaf1; }
     </style>
 </head>
 <body>
@@ -61,6 +65,13 @@
                             <option value="ADMIN" th:selected="${u.role == 'ADMIN'}">ADMIN</option>
                         </select>
                         <button type="submit" class="btn-ok">OK</button>
+                    </form>
+                    <form th:if="${u.id != currentUserId}"
+                          th:action="@{/admin/users/{id}/block(id=${u.id})}" method="post">
+                        <button type="submit"
+                                th:class="${u.blocked} ? 'btn-unblock' : 'btn-block'"
+                                th:text="${u.blocked} ? 'Разблокировать' : 'Заблокировать'">
+                        </button>
                     </form>
                     <form th:if="${u.id != currentUserId}"
                           th:action="@{/admin/users/{id}/delete(id=${u.id})}" method="post"

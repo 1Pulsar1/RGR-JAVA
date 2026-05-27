@@ -36,6 +36,17 @@ public class AdminController {
         return "redirect:/admin/users";
     }
 
+    @PostMapping("/users/{id}/block")
+    public String toggleBlock(@PathVariable Integer id,
+                              @AuthenticationPrincipal UserDetails userDetails) {
+        Integer currentId = userService.findByEmail(userDetails.getUsername()).getId();
+        if (currentId.equals(id)) {
+            return "redirect:/admin/users?error=self";
+        }
+        userService.toggleBlock(id);
+        return "redirect:/admin/users";
+    }
+
     @PostMapping("/users/{id}/delete")
     public String deleteUser(@PathVariable Integer id,
                              @AuthenticationPrincipal UserDetails userDetails) {
