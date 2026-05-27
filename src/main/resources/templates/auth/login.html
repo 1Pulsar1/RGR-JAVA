@@ -9,6 +9,16 @@
 <div class="auth-card">
     <h2>Авторизация</h2>
 
+    <div th:if="${param.blocked}" style="color:#c0392b;background:#fde8e8;padding:10px 14px;border-radius:6px;margin-bottom:14px;font-size:14px">
+        Ваш аккаунт заблокирован администратором
+    </div>
+    <div th:if="${param.error}" style="color:#c0392b;background:#fde8e8;padding:10px 14px;border-radius:6px;margin-bottom:14px;font-size:14px">
+        Неверный email или пароль
+    </div>
+    <div th:if="${param.registered}" style="color:#27ae60;background:#eafaf1;padding:10px 14px;border-radius:6px;margin-bottom:14px;font-size:14px">
+        Регистрация успешна — войдите в аккаунт
+    </div>
+
     <form th:action="@{/auth/login}" method="post" class="auth-form-container">
         <p style="margin-bottom: 5px">Введите почту</p>
         <input type="text" name="email" class="input-styled" required />
