@@ -41,13 +41,14 @@
                     </thead>
                     <tbody>
                     <tr th:each="tx : ${transactions}"
-                        th:attr="data-name=${tx.description},data-cat=${categoryMap[tx.categoryId]},data-type=${tx.type},data-amount=${tx.amount}">
+                        th:attr="data-name=${tx.description},data-cat=${tx.categoryId != null ? categoryMap[tx.categoryId] : ''},data-type=${tx.type},data-amount=${tx.amount}">
                         <td th:text="${#temporals.format(tx.operationDate, 'dd.MM.yyyy')}">—</td>
                         <td th:text="${tx.description}">—</td>
-                        <td th:text="${categoryMap[tx.categoryId] ?: '—'}">—</td>
+                        <td th:text="${tx.categoryId != null ? categoryMap[tx.categoryId] : '—'}">—</td>
                         <td th:text="${tx.type == 'INCOME'} ? 'Доход' : 'Расход'">—</td>
                         <td th:text="${tx.amount} + ' ₽'">—</td>
                         <td>
+                            <a th:href="@{/transactions/{id}/edit(id=${tx.id})}" class="action-link" style="margin-right:6px">Изменить</a>
                             <form th:action="@{/transactions/{id}/delete(id=${tx.id})}" method="post" style="display:inline">
                                 <button type="submit" class="action-link delete-link">Удалить</button>
                             </form>
