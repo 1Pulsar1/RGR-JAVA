@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>FinSync - Ошибка</title>
+    <link rel="stylesheet" th:href="@{/style.css}" href="/style.css">
+</head>
+<body class="auth-wrapper">
+<div class="auth-card" style="text-align:center">
+    <h2 style="color:#c0392b" th:text="${status ?: '500'}">500</h2>
+    <p style="color:#666;margin:12px 0 20px">Что-то пошло не так. Попробуй ещё раз.</p>
+    <a href="/dashboard" class="btn-blue" style="display:inline-block;padding:8px 24px;text-decoration:none">
+        На главную
+    </a>
+</div>
+</body>
+</html>

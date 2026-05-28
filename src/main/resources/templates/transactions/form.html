@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>FinSync - Транзакция</title>
+    <link rel="stylesheet" th:href="@{/style.css}" href="/style.css">
+</head>
+<body>
+<div th:replace="~{fragments/layout :: sidebar('transactions')}"></div>
+
+<main class="content">
+    <h1 th:text="${transaction.id == null} ? 'Новая транзакция' : 'Редактирование транзакции'">Транзакция</h1>
+
+    <div class="gray-block" style="max-width: 480px">
+        <form th:action="@{/transactions/save}" method="post" style="display:flex;flex-direction:column;gap:14px">
+            <input type="hidden" name="id" th:value="${transaction.id}"/>
+
+            <div>
+                <small>Тип</small>
+                <select name="type" class="input-styled" style="width:100%;box-sizing:border-box">
+                    <option value="INCOME"   th:selected="${transaction.type == 'INCOME'}">Доход</option>
+                    <option value="EXPENSE"  th:selected="${transaction.type == 'EXPENSE'}">Расход</option>
+                </select>
+            </div>
+
+            <div>
+                <small>Сумма (₽)</small>
+                <input type="number" step="0.01" name="amount" th:value="${transaction.amount}"
+                       class="input-styled" required placeholder="0.00"
+                       style="width:100%;box-sizing:border-box">
+            </div>
+
+            <div>
+                <small>Категория</small>
+                <select name="categoryId" class="input-styled" style="width:100%;box-sizing:border-box">
+                    <option value="">— без категории —</option>
+                    <option th:each="cat : ${categories}"
+                            th:value="${cat.id}"
+                            th:text="${cat.name}"
+                            th:selected="${transaction.categoryId == cat.id}">
+                    </option>
+                </select>
+            </div>
+
+            <div>
+                <small>Описание</small>
+                <input type="text" name="description" th:value="${transaction.description}"
+                       class="input-styled" placeholder="Необязательно"
+                       style="width:100%;box-sizing:border-box">
+            </div>
+
+            <div style="display:flex;gap:10px;margin-top:4px">
+                <button type="submit" class="btn-blue" style="padding:0 24px;height:38px">Сохранить</button>
+                <a th:href="@{/transactions}" style="height:38px;line-height:38px;padding:0 16px;background:#f0f0f0;border-radius:6px;text-decoration:none;color:#333;font-size:14px">Отмена</a>
+            </div>
+        </form>
+    </div>
+</main>
+</body>
+</html>
