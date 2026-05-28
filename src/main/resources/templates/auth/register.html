@@ -46,6 +46,10 @@
                 alert('Введите email!');
                 return;
             }
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                alert('Введите корректный email (например: user@example.com)');
+                return;
+            }
 
             const csrf = document.querySelector('meta[name="_csrf"]').getAttribute('content');
 
