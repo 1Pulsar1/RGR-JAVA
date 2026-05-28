@@ -33,4 +33,14 @@
         </li>
     </ul>
 
+    <div class="footer-link">
+        <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"
+             th:text="${#authentication.name}">email</div>
+        <form th:action="@{/auth/logout}" method="post" style="margin:0">
+            <button type="submit" style="background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;font-size:14px;padding:0;">
+                Выйти →
+            </button>
+        </form>
+    </div>
+
 </nav>

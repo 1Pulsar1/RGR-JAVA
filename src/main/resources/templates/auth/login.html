@@ -21,10 +21,10 @@
 
     <form th:action="@{/auth/login}" method="post" class="auth-form-container">
         <p style="margin-bottom: 5px">Введите почту</p>
-        <input type="email" name="email" class="input-styled" required />
+        <input type="email" name="email" class="input-styled" autocomplete="email" required />
 
         <p style="margin: 15px 0 5px">Введите пароль</p>
-        <input type="password" name="password" class="input-styled" required />
+        <input type="password" name="password" class="input-styled" autocomplete="current-password" required />
 
         <button type="submit" class="btn-blue" style="margin-top: 20px;">
             Войти
