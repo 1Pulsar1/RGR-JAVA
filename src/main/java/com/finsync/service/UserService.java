@@ -44,6 +44,11 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("Пользователь не найден"));
     }
 
+    public User findById(int id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Пользователь не найден"));
+    }
+
     public Iterable<User> findAll() {
         return userRepository.findAll();
     }

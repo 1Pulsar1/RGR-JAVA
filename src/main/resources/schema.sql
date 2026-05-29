@@ -14,6 +14,8 @@ CREATE TABLE IF NOT EXISTS categories (
     name VARCHAR(50) NOT NULL UNIQUE
 );
 
+ALTER TABLE categories ADD COLUMN IF NOT EXISTS type VARCHAR(10) DEFAULT NULL;
+
 CREATE TABLE IF NOT EXISTS transactions (
     id             SERIAL PRIMARY KEY,
     user_id        INT            NOT NULL REFERENCES users(id) ON DELETE CASCADE,

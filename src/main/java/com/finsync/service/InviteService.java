@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class InviteService {
@@ -24,11 +25,23 @@ public class InviteService {
         if (receiver.getId().equals(senderId)) {
             throw new IllegalArgumentException("Нельзя пригласить самого себя");
         }
+        if (!inviteRepository.findAcceptedBetweenUsers(senderId, receiver.getId()).isEmpty()) {
+            throw new IllegalArgumentException("Этот пользователь уже есть в вашем списке друзей");
+        }
+        if (!inviteRepository.findPendingBySenderAndReceiver(senderId, receiver.getId()).isEmpty()) {
+            throw new IllegalArgumentException("Приглашение этому пользователю уже отправлено");
+        }
         Invite invite = new Invite();
         invite.setSenderId(senderId);
         invite.setReceiverId(receiver.getId());
         invite.setStatus("PENDING");
         inviteRepository.save(invite);
+    }
+
+    public List<User> getPartners(int userId) {
+        return getAcceptedPartnerIds(userId).stream()
+                .map(userService::findById)
+                .collect(Collectors.toList());
     }
 
     public List<Invite> getSent(int userId) {
@@ -39,6 +52,15 @@ public class InviteService {
         return inviteRepository.findPendingByReceiverId(userId);
     }
 
+    public List<Invite> getAcceptedInvites(int userId) {
+        return inviteRepository.findAcceptedByUserId(userId);
+    }
+
+    public Invite getAcceptedInviteBetween(int userId, int friendId) {
+        List<Invite> list = inviteRepository.findAcceptedBetweenUsers(userId, friendId);
+        return list.isEmpty() ? null : list.get(0);
+    }
+
     public void accept(int inviteId) {
         updateStatus(inviteId, "ACCEPTED");
     }
@@ -47,7 +69,16 @@ public class InviteService {
         updateStatus(inviteId, "DECLINED");
     }
 
-    // возвращает id-шники всех с кем есть принятый инвайт
+    public void removeFriend(int inviteId, int userId) {
+        Invite invite = inviteRepository.findById(inviteId)
+                .orElseThrow(() -> new IllegalArgumentException("Приглашение не найдено"));
+        if (invite.getSenderId() != userId && invite.getReceiverId() != userId) {
+            throw new IllegalArgumentException("Нет доступа");
+        }
+        invite.setStatus("DECLINED");
+        inviteRepository.save(invite);
+    }
+
     public List<Integer> getAcceptedPartnerIds(int userId) {
         List<Invite> accepted = inviteRepository.findAcceptedByUserId(userId);
         List<Integer> result = new ArrayList<>();
