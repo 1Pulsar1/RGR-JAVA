@@ -63,18 +63,35 @@
               class="quick-form" style="display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end">
             <input type="text" class="btn-blue input-title" name="description" placeholder="название" required>
             <input type="number" step="0.01" class="btn-blue input-amount" name="amount" placeholder="сумма" required>
-            <select class="btn-blue btn-dropdown" name="categoryId">
+            <select id="quickCatSelect" class="btn-blue btn-dropdown" name="categoryId">
                 <option value="">категория</option>
-                <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"></option>
+                <option th:each="cat : ${categories}"
+                        th:value="${cat.id}"
+                        th:text="${cat.name}"
+                        th:attr="data-type=${cat.type}"></option>
             </select>
             <input type="datetime-local" class="btn-blue btn-date" name="operationDate">
-            <button type="submit" name="type" value="INCOME" class="btn-blue btn-income">добавить доход</button>
-            <button type="submit" name="type" value="EXPENSE" class="btn-blue btn-expense">добавить расход</button>
+            <button type="submit" name="type" value="INCOME" class="btn-blue btn-income"
+                    onmouseenter="quickFilter('INCOME')" onfocus="quickFilter('INCOME')">добавить доход</button>
+            <button type="submit" name="type" value="EXPENSE" class="btn-blue btn-expense"
+                    onmouseenter="quickFilter('EXPENSE')" onfocus="quickFilter('EXPENSE')">добавить расход</button>
         </form>
     </div>
 
 </main>
 
+<script>
+    function quickFilter(type) {
+        const sel = document.getElementById('quickCatSelect');
+        Array.from(sel.options).forEach(function(opt) {
+            if (!opt.value) { opt.hidden = false; return; }
+            const t = opt.getAttribute('data-type');
+            opt.hidden = t !== null && t !== type;
+        });
+        if (sel.selectedOptions[0] && sel.selectedOptions[0].hidden) sel.value = '';
+    }
+    quickFilter('INCOME');
+</script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script th:inline="javascript">
     const totalIncome = /*[[${totalIncome}]]*/ 0;
