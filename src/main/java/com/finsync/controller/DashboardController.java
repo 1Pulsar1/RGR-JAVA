@@ -39,6 +39,7 @@ public class DashboardController {
         BigDecimal totalIncome = transactionService.getTotalByType(userId, "INCOME");
         BigDecimal totalExpense = transactionService.getTotalByType(userId, "EXPENSE");
         BigDecimal balance = totalIncome.subtract(totalExpense);
+        System.out.println("[DEBUG] dashboard баланс: " + balance);
 
         model.addAttribute("balance", balance);
         model.addAttribute("totalIncome", totalIncome);

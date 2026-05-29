@@ -46,6 +46,13 @@ public class TransactionService {
     }
 
     public void save(Transaction transaction) {
+        if (transaction.getType().equals("EXPENSE")) {
+            BigDecimal balance = getSavings(transaction.getUserId());
+            // нельзя уйти в минус
+            if (balance.compareTo(transaction.getAmount()) < 0) {
+                throw new IllegalStateException("Недостаточно средств: баланс не может стать отрицательным");
+            }
+        }
         if (transaction.getOperationDate() == null) {
             transaction.setOperationDate(LocalDateTime.now());
         }
