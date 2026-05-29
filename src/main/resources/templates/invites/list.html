@@ -5,6 +5,77 @@
     <title>FinSync - Социальный режим</title>
     <link rel="stylesheet" th:href="@{/style.css}" href="/style.css">
     <style>
+        .friends-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+        .friend-card {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            min-width: 260px;
+            flex: 1;
+            transition: box-shadow 0.15s;
+        }
+        .friend-card:hover {
+            box-shadow: 0 2px 10px rgba(46,91,255,0.12);
+        }
+        .friend-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #2e5bff;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        .friend-email {
+            flex: 1;
+            font-size: 14px;
+            color: #333;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .friend-actions {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        .btn-session {
+            background: #2e5bff;
+            color: #fff;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            text-decoration: none;
+            display: inline-block;
+            line-height: 1.4;
+        }
+        .btn-session:hover { background: #1a47e8; }
+        .btn-remove {
+            background: none;
+            color: #ef5350;
+            border: 1px solid #ef5350;
+            padding: 5px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .btn-remove:hover { background: #fce4ec; }
         .invite-row {
             display: flex;
             justify-content: space-between;
@@ -34,13 +105,35 @@
 <main class="content">
     <h1>Социальный режим</h1>
 
+    <!-- список друзей -->
+    <div style="margin-bottom: 28px">
+        <h3 style="margin-bottom: 12px">Друзья</h3>
+        <div th:if="${!hasFriends}" style="color:#999;font-size:14px;padding:10px 0">
+            Пока нет друзей. Отправьте приглашение по e-mail.
+        </div>
+        <div class="friends-grid" th:if="${hasFriends}">
+            <div class="friend-card" th:each="friend : ${friends}">
+                <div class="friend-avatar" th:text="${friend.email.substring(0,1).toUpperCase()}">A</div>
+                <span class="friend-email" th:text="${friend.email}">user@example.com</span>
+                <div class="friend-actions">
+                    <a th:href="@{/invites/friends/{id}(id=${friend.id})}" class="btn-session">
+                        Открыть сессию
+                    </a>
+                    <form th:action="@{/invites/{id}/remove(id=${friendInviteIdMap[friend.id]})}" method="post">
+                        <button type="submit" class="btn-remove">Удалить</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- сравнительный график накоплений -->
     <div class="gray-block" style="margin-bottom: 25px">
-        <p style="font-weight: 600; margin-bottom: 15px">Сравнительная статистика накоплений</p>
+        <p style="font-weight: 600; margin-bottom: 15px">Сравнение накоплений</p>
         <canvas id="savingsChart" height="80"></canvas>
         <p th:if="${chartLabels.size() == 1}"
            style="color: #999; font-size: 13px; margin-top: 10px; text-align: center">
-            Примите или отправьте инвайт чтобы видеть сравнение
+            Добавьте друзей чтобы видеть сравнение
         </p>
     </div>
 
@@ -62,12 +155,12 @@
                 </form>
             </div>
 
-            <h3>Входящие</h3>
+            <h3 style="margin-top:20px">Входящие</h3>
             <div th:if="${received.empty}" style="color: #999; font-size: 14px; padding: 10px 0">
                 Входящих приглашений нет
             </div>
             <div th:each="inv : ${received}" class="invite-row">
-                <span>Приглашение от пользователя #<span th:text="${inv.senderId}"></span></span>
+                <span>От <span th:text="${senderEmailMap[inv.senderId]}"></span></span>
                 <div class="invite-actions">
                     <form th:action="@{/invites/{id}/accept(id=${inv.id})}" method="post">
                         <button type="submit" class="btn-accept">Принять</button>
@@ -86,7 +179,7 @@
                 Отправленных приглашений нет
             </div>
             <div th:each="inv : ${sent}" class="invite-row">
-                <span>Пользователю #<span th:text="${inv.receiverId}"></span></span>
+                <span th:text="${receiverEmailMap[inv.receiverId]}">user@example.com</span>
                 <span class="status-badge"
                       th:classappend="${inv.status == 'PENDING'} ? 'status-pending' : (${inv.status == 'ACCEPTED'} ? 'status-accepted' : 'status-declined')"
                       th:text="${inv.status == 'PENDING'} ? 'Ожидает' : (${inv.status == 'ACCEPTED'} ? 'Принято' : 'Отклонено')">
@@ -109,7 +202,7 @@
             datasets: [{
                 label: 'Накопления (₽)',
                 data: values,
-                backgroundColor: ['#2e5bff', '#5c6bc0', '#7986cb', '#9fa8da'],
+                backgroundColor: ['#2e5bff', '#5c6bc0', '#7986cb', '#9fa8da', '#c5cae9'],
                 borderRadius: 5
             }]
         },
@@ -119,15 +212,11 @@
                 legend: { display: false },
                 tooltip: {
                     callbacks: {
-                        label: function(ctx) {
-                            return ctx.parsed.y + ' ₽';
-                        }
+                        label: function(ctx) { return ctx.parsed.y + ' ₽'; }
                     }
                 }
             },
-            scales: {
-                y: { beginAtZero: true }
-            }
+            scales: { y: { beginAtZero: true } }
         }
     });
 </script>

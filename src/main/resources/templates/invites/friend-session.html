@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>FinSync - Сессия с другом</title>
+    <link rel="stylesheet" th:href="@{/style.css}" href="/style.css">
+    <style>
+        .session-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+        .session-avatar {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: #2e5bff;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+        .compare-card {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+        .compare-card .label {
+            font-size: 13px;
+            color: #999;
+            margin-bottom: 12px;
+        }
+        .compare-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 8px;
+        }
+        .compare-col {
+            flex: 1;
+        }
+        .compare-col .who {
+            font-size: 11px;
+            color: #aaa;
+            margin-bottom: 4px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .compare-col .amount {
+            font-size: 18px;
+            font-weight: 700;
+        }
+        .mine { color: #2e5bff; }
+        .theirs { color: #5c6bc0; }
+        .positive { color: #2e7d32; }
+        .negative { color: #c62828; }
+        .compare-divider {
+            width: 1px;
+            height: 40px;
+            background: #e0e0e0;
+        }
+        .btn-back {
+            background: #f5f5f5;
+            color: #333;
+            border: 1px solid #ddd;
+            padding: 8px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-back:hover { background: #ebebeb; }
+        .btn-remove-friend {
+            background: none;
+            color: #ef5350;
+            border: 1px solid #ef5350;
+            padding: 7px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn-remove-friend:hover { background: #fce4ec; }
+    </style>
+</head>
+<body>
+<div th:replace="~{fragments/layout :: sidebar('social')}"></div>
+
+<main class="content">
+
+    <div class="session-header">
+        <div class="session-avatar" th:text="${friend.email.substring(0,1).toUpperCase()}">A</div>
+        <div>
+            <div style="font-size:20px;font-weight:700" th:text="${friend.email}">friend@example.com</div>
+            <div style="font-size:13px;color:#999">Совместная сессия</div>
+        </div>
+    </div>
+
+    <!-- сравнительные карточки -->
+    <div class="comparison-grid">
+
+        <div class="compare-card">
+            <div class="label">Накопления</div>
+            <div class="compare-row">
+                <div class="compare-col">
+                    <div class="who" th:text="${myEmail}">me</div>
+                    <div class="amount mine" th:text="${mySavings} + ' ₽'">0 ₽</div>
+                </div>
+                <div class="compare-divider"></div>
+                <div class="compare-col">
+                    <div class="who" th:text="${friend.email}">friend</div>
+                    <div class="amount theirs" th:text="${friendSavings} + ' ₽'">0 ₽</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="compare-card">
+            <div class="label">Доходы</div>
+            <div class="compare-row">
+                <div class="compare-col">
+                    <div class="who" th:text="${myEmail}">me</div>
+                    <div class="amount positive" th:text="${myIncome} + ' ₽'">0 ₽</div>
+                </div>
+                <div class="compare-divider"></div>
+                <div class="compare-col">
+                    <div class="who" th:text="${friend.email}">friend</div>
+                    <div class="amount positive" th:text="${friendIncome} + ' ₽'">0 ₽</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="compare-card">
+            <div class="label">Расходы</div>
+            <div class="compare-row">
+                <div class="compare-col">
+                    <div class="who" th:text="${myEmail}">me</div>
+                    <div class="amount negative" th:text="${myExpense} + ' ₽'">0 ₽</div>
+                </div>
+                <div class="compare-divider"></div>
+                <div class="compare-col">
+                    <div class="who" th:text="${friend.email}">friend</div>
+                    <div class="amount negative" th:text="${friendExpense} + ' ₽'">0 ₽</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- сравнительный график -->
+    <div class="gray-block" style="margin-bottom: 28px">
+        <p style="font-weight:600;margin-bottom:15px">Сравнительный график</p>
+        <canvas id="compareChart" height="100"></canvas>
+    </div>
+
+    <!-- кнопки -->
+    <div style="display:flex;gap:12px;align-items:center">
+        <a th:href="@{/invites}" class="btn-back">← Назад</a>
+        <form th:action="@{/invites/{id}/remove(id=${invite.id})}" method="post">
+            <button type="submit" class="btn-remove-friend">Удалить из друзей</button>
+        </form>
+    </div>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script th:inline="javascript">
+    const myEmail      = /*[[${myEmail}]]*/ 'Я';
+    const friendEmail  = /*[[${friend.email}]]*/ 'Друг';
+    const mySavings    = /*[[${mySavings}]]*/ 0;
+    const friendSavings= /*[[${friendSavings}]]*/ 0;
+    const myIncome     = /*[[${myIncome}]]*/ 0;
+    const friendIncome = /*[[${friendIncome}]]*/ 0;
+    const myExpense    = /*[[${myExpense}]]*/ 0;
+    const friendExpense= /*[[${friendExpense}]]*/ 0;
+
+    new Chart(document.getElementById('compareChart'), {
+        type: 'bar',
+        data: {
+            labels: ['Накопления', 'Доходы', 'Расходы'],
+            datasets: [
+                {
+                    label: myEmail,
+                    data: [mySavings, myIncome, myExpense],
+                    backgroundColor: '#2e5bff',
+                    borderRadius: 4
+                },
+                {
+                    label: friendEmail,
+                    data: [friendSavings, friendIncome, friendExpense],
+                    backgroundColor: '#9fa8da',
+                    borderRadius: 4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'top' },
+                tooltip: {
+                    callbacks: {
+                        label: function(ctx) {
+                            return ctx.dataset.label + ': ' + ctx.parsed.y + ' ₽';
+                        }
+                    }
+                }
+            },
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+</script>
+</body>
+</html>

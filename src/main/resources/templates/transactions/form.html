@@ -17,7 +17,8 @@
 
             <div>
                 <small>Тип</small>
-                <select name="type" class="input-styled" style="width:100%;box-sizing:border-box">
+                <select id="typeSelect" name="type" class="input-styled" style="width:100%;box-sizing:border-box"
+                        onchange="filterCategories()">
                     <option value="INCOME"   th:selected="${transaction.type == 'INCOME'}">Доход</option>
                     <option value="EXPENSE"  th:selected="${transaction.type == 'EXPENSE'}">Расход</option>
                 </select>
@@ -32,11 +33,12 @@
 
             <div>
                 <small>Категория</small>
-                <select name="categoryId" class="input-styled" style="width:100%;box-sizing:border-box">
+                <select id="categorySelect" name="categoryId" class="input-styled" style="width:100%;box-sizing:border-box">
                     <option value="">— без категории —</option>
                     <option th:each="cat : ${categories}"
                             th:value="${cat.id}"
                             th:text="${cat.name}"
+                            th:attr="data-type=${cat.type}"
                             th:selected="${transaction.categoryId == cat.id}">
                     </option>
                 </select>
@@ -56,5 +58,18 @@
         </form>
     </div>
 </main>
+<script>
+    function filterCategories() {
+        const type = document.getElementById('typeSelect').value;
+        const sel = document.getElementById('categorySelect');
+        Array.from(sel.options).forEach(opt => {
+            if (!opt.value) { opt.hidden = false; return; }
+            const t = opt.getAttribute('data-type');
+            opt.hidden = t !== null && t !== type;
+        });
+        if (sel.selectedOptions[0] && sel.selectedOptions[0].hidden) sel.value = '';
+    }
+    filterCategories();
+</script>
 </body>
 </html>
